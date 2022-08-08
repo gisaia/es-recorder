@@ -1,0 +1,62 @@
+server:
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: ${ES_RECORDER_ACCESS_LOG_FILE:-es-recorder-access.log}
+        archivedLogFilenamePattern: ${ES_RECORDER_LOG_FILE_ARCHIVE:-es-recorder-access-%d.log.gz}
+  registerDefaultExceptionMappers: false
+  type: simple
+  rootPath: ${ES_RECORDER_PREFIX:-/es_recorder}
+  applicationContextPath: ${ES_RECORDER_APP_PATH:-/}
+  adminContextPath: ${ES_RECORDER_ADMIN_PATH:-/admin}
+  connector:
+    type: http
+    port: ${ES_RECORDER_PORT:-9997}
+  maxThreads: ${ES_RECORDER_MAX_THREADS:-1024}
+  minThreads: ${ES_RECORDER_MIN_THREADS:-8}
+  maxQueuedRequests: ${ES_RECORDER_MAX_QUEUED_REQUESTS:-1024}
+
+logging:
+  level: ${ES_RECORDER_LOGGING_LEVEL:-INFO}
+  loggers:
+    "javax.management.mbeanserver": ${ES_RECORDER_LOGGING_MBEAN_LEVEL:-INFO}
+    "org.eclipse.jetty": ${ES_RECORDER_LOGGING_JETTY_LEVEL:-INFO}
+  appenders:
+    - type: console
+      threshold:  ${ES_RECORDER_LOGGING_CONSOLE_LEVEL:-INFO}
+    - type: file
+      currentLogFilename: ${ES_RECORDER_LOGGING_FILE:-es-recorder.log}
+      threshold: ${ES_RECORDER_LOGGING_FILE_LEVEL:-INFO}
+      archive: ${ES_RECORDER_LOGGING_FILE_ARCHIVE:-true}
+      archivedLogFilenamePattern: ${ES_RECORDER_LOGGING_FILE_ARCHIVE_FILE_PATTERN:-es-recorder-%d.log}
+      archivedFileCount: ${ES_RECORDER_LOGGING_FILE_ARCHIVE_FILE_COUNT:-5}
+
+swagger: # Configuration of SWAGGER for generating documentation and APIs
+  resourcePackage: com.gisaia.recorder.rest.service # The java package to process for extracting the APIs
+  # temporary patch for bug https://github.com/smoketurner/dropwizard-swagger/issues/206
+  # to be removed when version of dropwizard.swagger.version is upgraded
+  customJavascript: ${ES_RECORDER_CUSTOM_JS:-/es_recorder/swagger-static/custom-request-interceptor.js}
+
+zipkin: # The ZIPKIN configuration, not active by default
+  enabled: ${ARLAS_ZIPKIN_ENABLED:-false} # Do we want zipkin to collect the API calls? Not by default.
+  serviceHost: ${ARLAS_ZIPKIN_SERVICE_HOST:-127.0.0.1} # Listening IP address of the service
+  servicePort: ${ARLAS_PORT:-9999} # Listening port of the service
+  collector: ${ARLAS_ZIPKIN_COLLECTOR:-http}
+  baseUrl: ${ARLAS_ZIPKIN_BASEURL:-http://localhost:9411} # Where is zipkin running?
+
+arlas_cors:
+  enabled: ${ARLAS_CORS_ENABLED:-true}
+  allowed_origins: ${ARLAS_CORS_ALLOWED_ORIGINS:-"*"}
+  allowed_headers: ${ARLAS_CORS_ALLOWED_HEADERS:-"arlas-user,arlas-groups,arlas-organization,X-Requested-With,Content-Type,Accept,Origin,Authorization,WWW-Authenticate"}
+  allowed_methods: ${ARLAS_CORS_ALLOWED_METHODS:-"OPTIONS,GET,PUT,POST,DELETE,HEAD"}
+  allowed_credentials: ${ARLAS_CORS_ALLOWED_CREDENTIALS:-true}
+  exposed_headers: ${ARLAS_CORS_EXPOSED_HEADERS:-"Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin,Location,WWW-Authenticate"}
+
+elastic:
+  elastic-nodes: ${ES_RECORDER_ELASTIC_NODES:-localhost:9200}
+  elastic-sniffing: ${ARLAS_ELASTIC_SNIFFING:-false}
+  elastic-enable-ssl: ${ES_RECORDER_ELASTIC_ENABLE_SSL:-false}
+  elastic-credentials: ${ES_RECORDER_ELASTIC_CREDENTIALS}
+  elastic-skip-master: ${ES_RECORDER_ELASTIC_SKIP_MASTER:-true}
+
+es_index:  ${ES_RECORDER_ELASTIC_INDEX:-records}

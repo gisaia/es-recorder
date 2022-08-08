@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  es-recorder:
+    build:
+      context: ../..
+      dockerfile: ${DOCKERFILE:-docker/docker-files/Dockerfile-package-only}
+    image: docker.cloudsmith.io/gisaia/public/es-recorder:${ES_RECORDER_SERVER_VERSION:-latest}
+    container_name: es-recorder
+    environment:
+      - ES_RECORDER_LOGGING_LEVEL="${ES_RECORDER_LOGGING_LEVEL:-INFO}"
+      - ES_RECORDER_LOGGING_CONSOLE_LEVEL="${ES_RECORDER_LOGGING_CONSOLE_LEVEL:-INFO}"
+      - ES_RECORDER_HOST="${ES_RECORDER_HOST:-localhost}"
+      - ES_RECORDER_PORT="${ES_RECORDER_PORT:-9997}"
+      - ES_RECORDER_PREFIX="${ES_RECORDER_PREFIX:-/es_recorder}"
+      - ES_RECORDER_APP_PATH="${ES_RECORDER_APP_PATH:-/}"
+      - ES_RECORDER_ELASTIC_INDEX="${ES_RECORDER_ELASTIC_INDEX:-records}"
+      - ES_RECORDER_ELASTIC_NODES=${ES_RECORDER_ELASTIC_NODES:-elasticsearch:9200}
+      - ES_RECORDER_ELASTIC_ENABLE_SSL="${ES_RECORDER_ELASTIC_ENABLE_SSL:-false}"
+      - ES_RECORDER_ELASTIC_CREDENTIALS="${ES_RECORDER_ELASTIC_CREDENTIALS}"
+      - ES_RECORDER_ELASTIC_SKIP_MASTER="${ES_RECORDER_ELASTIC_SKIP_MASTER:-true}"
+    ports:
+      - "9997:9997"

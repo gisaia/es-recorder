@@ -1,0 +1,16 @@
+###################
+# PACKAGING STAGE #
+###################
+FROM gisaia/arlas-openjdk:17-distroless
+
+# application placed into /opt/app
+WORKDIR /opt/app
+ADD es-recorder-server/target/es-recorder-server*.jar /opt/app/es-recorder-server.jar
+ADD conf/configuration.yaml /opt/app/configuration.yaml
+EXPOSE 9997
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl http://localhost:9997/admin/healthcheck | grep -v "\"healthy\":false" || exit 1
+
+ENV JDK_JAVA_OPTIONS="-Xmx512m -XX:+ExitOnOutOfMemoryError"
+CMD ["es-recorder-server.jar", "server", "/opt/app/configuration.yaml"]
