@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.gisaia.recorder.core.RecordStorageService;
 import com.gisaia.recorder.rest.service.RecorderRestService;
 import com.gisaia.recorder.util.EsRecorderConfiguration;
 import com.smoketurner.dropwizard.zipkin.ZipkinBundle;
@@ -80,7 +81,8 @@ public class RecorderServer extends Application<EsRecorderConfiguration> {
         environment.jersey().register(new ConstraintViolationExceptionMapper());
         environment.jersey().register(new ElasticsearchExceptionMapper());
 
-        environment.jersey().register(new RecorderRestService());
+        RecordStorageService service = new RecordStorageService(configuration);
+        environment.jersey().register(new RecorderRestService(service));
 
         //cors
         if (configuration.arlasCorsConfiguration.enabled) {
