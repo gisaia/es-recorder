@@ -1,10 +1,13 @@
 package com.gisaia.recorder.rest.service;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.gisaia.recorder.core.RecordStorageService;
+import io.arlas.commons.exceptions.ArlasException;
 import io.arlas.commons.rest.response.Error;
 import io.swagger.annotations.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -22,7 +25,10 @@ import javax.ws.rs.core.*;
 public class RecorderRestService {
     public static final String UTF8JSON = MediaType.APPLICATION_JSON + ";charset=utf-8";
 
-    public RecorderRestService() {
+    private final RecordStorageService service;
+
+    public RecorderRestService(RecordStorageService service) {
+        this.service = service;
     }
 
     @Timed
@@ -41,15 +47,19 @@ public class RecorderRestService {
 
     public Response store(
             @Context UriInfo uriInfo,
+            @Context HttpServletRequest httpServletRequest,
             @Context HttpHeaders headers,
 
             @ApiParam(name = "record")
-            @Valid JsonNode record
-    ) {
+            @Valid ObjectNode record
+    ) throws ArlasException {
 
         return Response.ok(uriInfo.getRequestUriBuilder().build())
-                .entity("todo")
-                .type("application/json")
+                .entity(service.store(record,
+                        headers.getHeaderString(HttpHeaders.USER_AGENT),
+                        headers.getHeaderString("Referer"),
+                        httpServletRequest.getRemoteAddr()))
+                .type(MediaType.TEXT_PLAIN)
                 .build();
     }
 

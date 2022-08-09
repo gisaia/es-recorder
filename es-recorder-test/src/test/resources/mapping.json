@@ -1,0 +1,77 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "id": {
+        "type": "keyword",
+        "copy_to": "internal.fulltext"
+      },
+      "internal": {
+        "properties": {
+          "fulltext": {
+            "type": "text",
+            "fielddata": true
+          }
+        }
+      },
+      "client": {
+        "properties": {
+          "ip": {
+            "type": "keyword",
+            "copy_to": "internal.fulltext"
+          },
+          "browser": {
+            "type": "keyword",
+            "copy_to": "internal.fulltext"
+          },
+          "hostname": {
+            "type": "keyword",
+            "copy_to": "internal.fulltext"
+          }
+        }
+      },
+      "product": {
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "copy_to": "internal.fulltext"
+          },
+          "date": {
+            "type": "date",
+            "format": "strict_date"
+          },
+          "collection": {
+            "type": "keyword",
+            "copy_to": "internal.fulltext"
+          },
+          "source": {
+            "type": "keyword",
+            "copy_to": "internal.fulltext"
+          },
+          "centroid": {
+            "type": "geo_point"
+          },
+          "geometrie": {
+            "type": "geo_shape"
+          }
+        }
+      },
+      "download": {
+        "properties": {
+          "date": {
+            "type": "date",
+            "format": "strict_date_time"
+          },
+          "email_user": {
+            "type": "keyword",
+            "copy_to": "internal.fulltext"
+          },
+          "status": {
+            "type": "keyword",
+            "copy_to": "internal.fulltext"
+          }
+        }
+      }
+    }
+  }
+}
