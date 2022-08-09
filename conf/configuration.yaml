@@ -60,7 +60,3 @@ elastic:
   elastic-skip-master: ${ES_RECORDER_ELASTIC_SKIP_MASTER:-true}
 
 es_index:  ${ES_RECORDER_ELASTIC_INDEX:-records}
-
-user_header: ${ES_RECORDER_USER_HEADER:-X-Forwarded-User}
-#comma separated list of host prefix authorized to access the service (referer must start with one of these values)
-authorized_referrers: ${ES_RECORDER_AUTHORIZED_REFERRERS:-http://localhost,https://localhost}

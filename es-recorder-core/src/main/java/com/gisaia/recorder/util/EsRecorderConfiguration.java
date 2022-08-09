@@ -9,11 +9,6 @@ public class EsRecorderConfiguration extends ArlasBaseConfiguration {
     @JsonProperty("es_index")
     public String esIndex;
 
-    @JsonProperty("authorized_referrers")
-    public String authorizedReferrers;
-    @JsonProperty("user_header")
-    public String userHeader;
-
     public void check() throws ArlasConfigurationException {
         super.check();
         elasticConfiguration.check();

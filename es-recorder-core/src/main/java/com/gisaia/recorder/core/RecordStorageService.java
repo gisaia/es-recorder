@@ -6,10 +6,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.gisaia.recorder.util.EsRecorderConfiguration;
 import io.arlas.commons.exceptions.ArlasException;
 import io.arlas.server.core.impl.elastic.utils.ElasticClient;
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 public class RecordStorageService {
+    private static Logger LOGGER = LoggerFactory.getLogger(RecordStorageService.class);
     private final String esIndex;
     private final ElasticClient esClient;
 
@@ -33,5 +41,22 @@ public class RecordStorageService {
             throw new ArlasException(e.getMessage());
         }
         return id;
+    }
+
+    public void delete(String field, String value) {
+        DeleteByQueryRequest request = new DeleteByQueryRequest(esIndex);
+        request.setConflicts("proceed");
+        request.setQuery(new TermQueryBuilder(field, value));
+        esClient.getClient().deleteByQueryAsync(request, RequestOptions.DEFAULT, new ActionListener<BulkByScrollResponse>() {
+            @Override
+            public void onResponse(BulkByScrollResponse bulkResponse) {
+                LOGGER.info("Deleted docs with " + field + "=" + value + " (" + bulkResponse.getDeleted() + " docs deleted)");
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                LOGGER.warn("Failed deletion of docs with " + field + "=" + value + " because of " + e.getMessage());
+            }
+        });
     }
 }
