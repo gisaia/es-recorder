@@ -81,8 +81,7 @@ public class RecorderServer extends Application<EsRecorderConfiguration> {
         environment.jersey().register(new ConstraintViolationExceptionMapper());
         environment.jersey().register(new ElasticsearchExceptionMapper());
 
-        RecordStorageService service = new RecordStorageService(configuration);
-        environment.jersey().register(new RecorderRestService(service));
+        environment.jersey().register(new RecorderRestService(configuration));
 
         //cors
         if (configuration.arlasCorsConfiguration.enabled) {
