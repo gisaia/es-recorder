@@ -5,17 +5,22 @@ SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd)"
 PROJECT_ROOT_DIRECTORY="$(dirname "$SCRIPT_DIRECTORY")"
 BUILD_OPTS="--no-build"
 DOCKER_COMPOSE="${PROJECT_ROOT_DIRECTORY}/docker/docker-files/docker-compose.yml"
+DOCKER_COMPOSE_ES="${PROJECT_ROOT_DIRECTORY}/docker/docker-files/docker-compose-elasticsearch.yml"
 
 for i in "$@"
 do
 case $i in
-  --build)
-  BUILD_OPTS="--build"
-  shift # past argument with no value
-  ;;
-  *)
-    # unknown option
-  ;;
+    -es=*|--elasticsearch=*)
+    export ELASTIC_DATADIR="${i#*=}"
+    shift # past argument=value
+    ;;
+    --build)
+    BUILD_OPTS="--build"
+    shift # past argument with no value
+    ;;
+    *)
+      # unknown option
+    ;;
 esac
 done
 
@@ -40,6 +45,16 @@ docker run --rm \
 	maven:3.8.5-openjdk-17 \
 	mvn clean install -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 echo "es-recorder:${ES_RECORDER_VERSION}"
+
+if [ -z "${ELASTIC_DATADIR}" ]; then
+  echo "An external ES is used"
+else
+  echo "Starting ES"
+  docker-compose -f ${DOCKER_COMPOSE_ES} --project-name esrecorder up -d
+  echo "Waiting for ES readiness"
+  docker run --net esrecorder_default --rm busybox sh -c 'i=1; until nc -w 2 elasticsearch 9200; do if [ $i -lt 30 ]; then sleep 1; else break; fi; i=$(($i + 1)); done'
+  echo "ES is ready"
+fi
 
 echo "===> start ES RECORDER stack"
 docker-compose -f ${DOCKER_COMPOSE} --project-name esrecorder up -d ${BUILD_OPTS}

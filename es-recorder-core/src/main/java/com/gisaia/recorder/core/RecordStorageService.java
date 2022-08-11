@@ -1,10 +1,12 @@
 package com.gisaia.recorder.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.gisaia.recorder.util.EsRecorderConfiguration;
 import io.arlas.commons.exceptions.ArlasException;
+import io.arlas.commons.exceptions.NotFoundException;
 import io.arlas.server.core.impl.elastic.utils.ElasticClient;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.client.RequestOptions;
@@ -47,6 +49,7 @@ public class RecordStorageService {
         DeleteByQueryRequest request = new DeleteByQueryRequest(esIndex);
         request.setConflicts("proceed");
         request.setQuery(new TermQueryBuilder(field, value));
+        request.setRefresh(true);
         esClient.getClient().deleteByQueryAsync(request, RequestOptions.DEFAULT, new ActionListener<BulkByScrollResponse>() {
             @Override
             public void onResponse(BulkByScrollResponse bulkResponse) {
@@ -58,5 +61,18 @@ public class RecordStorageService {
                 LOGGER.warn("Failed deletion of docs with " + field + "=" + value + " because of " + e.getMessage());
             }
         });
+    }
+
+    public JsonNode get(String id) throws ArlasException {
+        try {
+            String record = esClient.getHit(esIndex, id, null, null);
+            if (record != null) {
+                return mapper.readValue(record, JsonNode.class);
+            } else {
+                throw new NotFoundException();
+            }
+        } catch (JsonProcessingException e) {
+            throw new ArlasException(e.getMessage());
+        }
     }
 }

@@ -1,5 +1,7 @@
 {
-  "mappings": {
+  "_source": {
+    "enabled": true
+    },
     "dynamic": false,
     "properties": {
       "id": {
