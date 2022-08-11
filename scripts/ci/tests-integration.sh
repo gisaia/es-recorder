@@ -27,9 +27,8 @@ SCRIPT_PATH=`cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd`
 cd ${SCRIPT_PATH}/../..
 
 function start_stack() {
-  export ARLAS_AUTH_PUBLIC_URIS=".*"
   ./scripts/docker-clean.sh
-  ./scripts/docker-run.sh --build
+  ./scripts/docker-run.sh -es=/tmp --build
 }
 
 function test_rest_server() {
@@ -41,6 +40,7 @@ function test_rest_server() {
         -v $HOME/.m2:/root/.m2 \
         -e ES_RECORDER_HOST="es-recorder" \
         -e ES_RECORDER_PREFIX="es_recorder" \
+        -e ES_RECORDER_ELASTIC_NODES="elasticsearch:9200" \
         -e ES_RECORDER_APP_PATH=${ES_RECORDER_APP_PATH} \
         --network esrecorder_default \
         maven:3.8.5-openjdk-17 \

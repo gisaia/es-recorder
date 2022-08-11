@@ -47,6 +47,12 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.arlas</groupId>
+            <artifactId>arlas-core</artifactId>
+            <version>22.0.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

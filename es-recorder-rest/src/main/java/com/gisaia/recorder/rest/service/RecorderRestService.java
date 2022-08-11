@@ -1,6 +1,7 @@
 package com.gisaia.recorder.rest.service;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.gisaia.recorder.core.RecordStorageService;
 import com.gisaia.recorder.util.EsRecorderConfiguration;
@@ -33,12 +34,11 @@ public class RecorderRestService {
     }
 
     @Timed
-    @Path("store")
     @POST
     @Produces(UTF8JSON)
     @Consumes(UTF8JSON)
     @ApiOperation(value = "Store a new record in elasticsearch", produces = UTF8JSON, consumes = UTF8JSON)
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful operation", response = String.class),
+    @ApiResponses(value = {@ApiResponse(code = 201, message = "Successful operation", response = String.class),
             @ApiResponse(code = 404, message = "Index not found.", response = Error.class),
             @ApiResponse(code = 500, message = "Application error.", response = Error.class)})
 
@@ -50,7 +50,7 @@ public class RecorderRestService {
             @ApiParam(name = "record")
             @Valid ObjectNode record
     ) throws ArlasException {
-        return Response.ok(uriInfo.getRequestUriBuilder().build())
+        return Response.created(uriInfo.getRequestUriBuilder().build())
                 .entity(service.store(record,
                         headers.getHeaderString(HttpHeaders.USER_AGENT),
                         headers.getHeaderString("Referer"),
@@ -60,12 +60,35 @@ public class RecorderRestService {
     }
 
     @Timed
-    @Path("delete")
+    @Path("{id}")
+    @GET
+    @Produces(UTF8JSON)
+    @Consumes(UTF8JSON)
+    @ApiOperation(value = "Get a record from elasticsearch", produces = UTF8JSON, consumes = UTF8JSON)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful operation", response = JsonNode.class),
+            @ApiResponse(code = 404, message = "Index not found.", response = Error.class),
+            @ApiResponse(code = 500, message = "Application error.", response = Error.class)})
+
+    public Response get(
+            @Context UriInfo uriInfo,
+            @Context HttpServletRequest httpServletRequest,
+            @Context HttpHeaders headers,
+
+            @ApiParam(name = "id", required = true)
+            @PathParam(value = "id") String id
+    ) throws ArlasException {
+        return Response.ok(uriInfo.getRequestUriBuilder().build())
+                .entity(service.get(id))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    @Timed
     @DELETE
     @Produces(UTF8JSON)
     @Consumes(UTF8JSON)
     @ApiOperation(value = "Delete records from elasticsearch", produces = UTF8JSON, consumes = UTF8JSON)
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful operation", response = String.class),
+    @ApiResponses(value = {@ApiResponse(code = 202, message = "Successful operation", response = String.class),
             @ApiResponse(code = 404, message = "Index not found.", response = Error.class),
             @ApiResponse(code = 500, message = "Application error.", response = Error.class)})
 
@@ -81,7 +104,7 @@ public class RecorderRestService {
             @QueryParam(value = "value") String value
     ) {
         service.delete(field, value);
-        return Response.ok(uriInfo.getRequestUriBuilder().build())
+        return Response.accepted(uriInfo.getRequestUriBuilder().build())
                 .entity("request executing in background")
                 .type(MediaType.TEXT_PLAIN)
                 .build();
