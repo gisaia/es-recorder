@@ -20,16 +20,14 @@ import java.util.UUID;
 
 public class RecordStorageService {
     private static Logger LOGGER = LoggerFactory.getLogger(RecordStorageService.class);
-    private final String esIndex;
     private final ElasticClient esClient;
 
     private final ObjectMapper mapper = new ObjectMapper();
     public RecordStorageService(EsRecorderConfiguration configuration) {
-        this.esIndex = configuration.esIndex;
         this.esClient = new ElasticClient(configuration.elasticConfiguration);
     }
 
-    public String store(ObjectNode record, String userAgent, String referer, String remoteAddr) throws ArlasException {
+    public String store(ObjectNode record, String userAgent, String referer, String remoteAddr, String esIndex) throws ArlasException {
         String id = UUID.randomUUID().toString();
         record.put("id", id);
         ObjectNode client = record.putObject("client");
@@ -45,7 +43,7 @@ public class RecordStorageService {
         return id;
     }
 
-    public void delete(String field, String value) {
+    public void delete(String field, String value, String esIndex) {
         DeleteByQueryRequest request = new DeleteByQueryRequest(esIndex);
         request.setConflicts("proceed");
         request.setQuery(new TermQueryBuilder(field, value));
@@ -63,7 +61,7 @@ public class RecordStorageService {
         });
     }
 
-    public JsonNode get(String id) throws ArlasException {
+    public JsonNode get(String id, String esIndex) throws ArlasException {
         try {
             String record = esClient.getHit(esIndex, id, null, null);
             if (record != null) {

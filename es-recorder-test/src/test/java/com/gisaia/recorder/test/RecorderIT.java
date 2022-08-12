@@ -10,23 +10,25 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.sniff.Sniffer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWithIgnoringCase;
 import io.arlas.server.core.impl.elastic.utils.ElasticClient;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 public class RecorderIT {
     protected static String recorderAppPath;
-    protected static String id;
     public static ElasticClient client;
+    public final static String RECORDS_INDEX_NAME="records";
+
     static {
         HttpHost[] nodes = ElasticConfiguration.getElasticNodes(Optional.ofNullable(System.getenv("ES_RECORDER_ELASTIC_NODES")).orElse("localhost:9200"), false);
         ImmutablePair<RestHighLevelClient, Sniffer> pair = ElasticTool.getRestHighLevelClient(nodes,false, null, true, true);
@@ -46,9 +48,9 @@ public class RecorderIT {
     }
 
     @BeforeClass
-    public static void beforeClass() {
+    public static  void before() {
         try {
-            createIndex("records","mapping.json");
+            createIndex(RECORDS_INDEX_NAME,"mapping.json");
         } catch (ArlasException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -57,29 +59,48 @@ public class RecorderIT {
     }
 
     @AfterClass
-    public static void afterClass() throws IOException {
-        //clearDataSet();
+    public static  void afterClass() throws IOException {
+        clearDataSet();
     }
 
     @Test
     public void test01StoreRecord() {
-        id = storeRecord().then().statusCode(201)
+        String id = storeRecord().then().statusCode(201)
                 .extract().body().asString();
         getRecord(id).then().statusCode(200)
                 .body("download.email_user", equalTo("foo@bar.com"))
                 .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
+        deleteRecord().then().statusCode(202);
     }
 
     @Test
-    public void test02DeleteRecord() {
-
-        id = storeRecord().then().statusCode(201)
+    public void test02DeleteRecord() throws InterruptedException {
+        String id = storeRecord().then().statusCode(201)
                 .extract().body().asString();
         getRecord(id).then().statusCode(200)
                 .body("download.email_user", equalTo("foo@bar.com"))
                 .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
-
         deleteRecord().then().statusCode(202);
+        TimeUnit.SECONDS.sleep(10);
+        getRecord(id).then().statusCode(404);
+    }
+
+    @Test
+    @Ignore
+    public void test03DeleteManyRecords() throws InterruptedException {
+        String id = storeRecord().then().statusCode(201)
+                .extract().body().asString();
+        String id2 = storeRecord().then().statusCode(201)
+                .extract().body().asString();
+        getRecord(id).then().statusCode(200)
+                .body("download.email_user", equalTo("foo@bar.com"))
+                .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
+        getRecord(id2).then().statusCode(200)
+                .body("download.email_user", equalTo("foo@bar.com"))
+                .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
+        deleteRecord().then().statusCode(202);
+        TimeUnit.SECONDS.sleep(10);
+        getRecord(id2).then().statusCode(404);
         getRecord(id).then().statusCode(404);
     }
 
@@ -106,7 +127,7 @@ public class RecorderIT {
                         	}
                         }                                                                                  
                         """)
-                .post(recorderAppPath.concat("records"));
+                .post(recorderAppPath.concat("records/").concat(RECORDS_INDEX_NAME));
     }
 
     protected Response deleteRecord() {
@@ -114,14 +135,14 @@ public class RecorderIT {
                 .contentType("application/json")
                 .queryParam("field", "download.email_user")
                 .queryParam("value", "foo@bar.com")
-                .delete(recorderAppPath.concat("records"));
+                .delete(recorderAppPath.concat("records/").concat(RECORDS_INDEX_NAME));
     }
 
     protected Response getRecord(String id) {
         return given()
                 .pathParam("id", id)
                 .contentType("application/json")
-                .get(recorderAppPath.concat("records/{id}"));
+                .get(recorderAppPath.concat("records/").concat(RECORDS_INDEX_NAME).concat("/{id}"));
     }
 
     private static void createIndex(String indexName, String mappingFileName) throws ArlasException, IOException {
@@ -135,7 +156,7 @@ public class RecorderIT {
 
     private static void clearDataSet() {
         try {
-            client.deleteIndex("records");
+            client.deleteIndex(RECORDS_INDEX_NAME);
         } catch (ArlasException e) {
             e.printStackTrace();
         }
