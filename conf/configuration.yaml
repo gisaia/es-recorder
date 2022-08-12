@@ -58,5 +58,3 @@ elastic:
   elastic-enable-ssl: ${ES_RECORDER_ELASTIC_ENABLE_SSL:-false}
   elastic-credentials: ${ES_RECORDER_ELASTIC_CREDENTIALS}
   elastic-skip-master: ${ES_RECORDER_ELASTIC_SKIP_MASTER:-true}
-
-es_index:  ${ES_RECORDER_ELASTIC_INDEX:-records}

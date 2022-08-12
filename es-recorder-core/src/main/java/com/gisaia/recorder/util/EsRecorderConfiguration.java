@@ -6,9 +6,6 @@ import io.arlas.server.core.app.ArlasBaseConfiguration;
 
 public class EsRecorderConfiguration extends ArlasBaseConfiguration {
 
-    @JsonProperty("es_index")
-    public String esIndex;
-
     public void check() throws ArlasConfigurationException {
         super.check();
         elasticConfiguration.check();

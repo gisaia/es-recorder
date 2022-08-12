@@ -34,6 +34,7 @@ public class RecorderRestService {
     }
 
     @Timed
+    @Path("/{index}")
     @POST
     @Produces(UTF8JSON)
     @Consumes(UTF8JSON)
@@ -47,6 +48,11 @@ public class RecorderRestService {
             @Context HttpServletRequest httpServletRequest,
             @Context HttpHeaders headers,
 
+            @ApiParam(name = "index",
+                    value = "index",
+                    required = true)
+            @PathParam(value = "index") String index,
+
             @ApiParam(name = "record")
             @Valid ObjectNode record
     ) throws ArlasException {
@@ -54,13 +60,13 @@ public class RecorderRestService {
                 .entity(service.store(record,
                         headers.getHeaderString(HttpHeaders.USER_AGENT),
                         headers.getHeaderString("Referer"),
-                        httpServletRequest.getRemoteAddr()))
+                        httpServletRequest.getRemoteAddr(), index))
                 .type(MediaType.TEXT_PLAIN)
                 .build();
     }
 
     @Timed
-    @Path("{id}")
+    @Path("/{index}/{id}")
     @GET
     @Produces(UTF8JSON)
     @Consumes(UTF8JSON)
@@ -73,18 +79,22 @@ public class RecorderRestService {
             @Context UriInfo uriInfo,
             @Context HttpServletRequest httpServletRequest,
             @Context HttpHeaders headers,
-
+            @ApiParam(name = "index",
+                    value = "index",
+                    required = true)
+            @PathParam(value = "index") String index,
             @ApiParam(name = "id", required = true)
             @PathParam(value = "id") String id
     ) throws ArlasException {
         return Response.ok(uriInfo.getRequestUriBuilder().build())
-                .entity(service.get(id))
+                .entity(service.get(id,index))
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
 
     @Timed
     @DELETE
+    @Path("/{index}")
     @Produces(UTF8JSON)
     @Consumes(UTF8JSON)
     @ApiOperation(value = "Delete records from elasticsearch", produces = UTF8JSON, consumes = UTF8JSON)
@@ -96,14 +106,20 @@ public class RecorderRestService {
             @Context UriInfo uriInfo,
             @Context HttpServletRequest httpServletRequest,
             @Context HttpHeaders headers,
+            @ApiParam(name = "index",
+                    value = "index",
+                    required = true)
+            @PathParam(value = "index") String index,
 
             @ApiParam(name = "field")
             @QueryParam(value = "field") String field,
 
             @ApiParam(name = "value")
             @QueryParam(value = "value") String value
+
+
     ) {
-        service.delete(field, value);
+        service.delete(field, value, index);
         return Response.accepted(uriInfo.getRequestUriBuilder().build())
                 .entity("request executing in background")
                 .type(MediaType.TEXT_PLAIN)
