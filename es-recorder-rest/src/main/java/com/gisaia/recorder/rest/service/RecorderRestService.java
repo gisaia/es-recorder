@@ -36,7 +36,7 @@ public class RecorderRestService {
     @Timed
     @Path("/{index}")
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(UTF8JSON)
     @Consumes(UTF8JSON)
     @ApiOperation(value = "Store a new record in elasticsearch", produces = UTF8JSON, consumes = UTF8JSON)
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Successful operation", response = String.class),
@@ -61,7 +61,7 @@ public class RecorderRestService {
                         headers.getHeaderString(HttpHeaders.USER_AGENT),
                         headers.getHeaderString("Referer"),
                         httpServletRequest.getRemoteAddr(), index))
-                .type(MediaType.TEXT_PLAIN)
+                .type(UTF8JSON)
                 .build();
     }
 

@@ -13,6 +13,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class RecordStorageService {
         this.esClient = new ElasticClient(configuration.elasticConfiguration);
     }
 
-    public String store(ObjectNode record, String userAgent, String referer, String remoteAddr, String esIndex) throws ArlasException {
+    public JSONObject store(ObjectNode record, String userAgent, String referer, String remoteAddr, String esIndex) throws ArlasException {
         String id = UUID.randomUUID().toString();
         record.put("id", id);
         ObjectNode client = record.putObject("client");
@@ -40,7 +41,9 @@ public class RecordStorageService {
         } catch (JsonProcessingException e) {
             throw new ArlasException(e.getMessage());
         }
-        return id;
+        JSONObject json = new JSONObject();
+        json.put("id", id);
+        return json;
     }
 
     public void delete(String field, String value, String esIndex) {
