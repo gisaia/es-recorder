@@ -66,7 +66,7 @@ public class RecorderIT {
     @Test
     public void test01StoreRecord() {
         String id = storeRecord().then().statusCode(201)
-                .extract().body().asString();
+                .extract().body().jsonPath().get("id");
         getRecord(id).then().statusCode(200)
                 .body("download.email_user", equalTo("foo@bar.com"))
                 .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
@@ -76,7 +76,7 @@ public class RecorderIT {
     @Test
     public void test02DeleteRecord() throws InterruptedException {
         String id = storeRecord().then().statusCode(201)
-                .extract().body().asString();
+                .extract().body().jsonPath().get("id");
         getRecord(id).then().statusCode(200)
                 .body("download.email_user", equalTo("foo@bar.com"))
                 .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
@@ -89,9 +89,9 @@ public class RecorderIT {
     @Ignore
     public void test03DeleteManyRecords() throws InterruptedException {
         String id = storeRecord().then().statusCode(201)
-                .extract().body().asString();
+                .extract().body().jsonPath().get("id");
         String id2 = storeRecord().then().statusCode(201)
-                .extract().body().asString();
+                .extract().body().jsonPath().get("id");
         getRecord(id).then().statusCode(200)
                 .body("download.email_user", equalTo("foo@bar.com"))
                 .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
