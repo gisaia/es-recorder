@@ -36,7 +36,7 @@ public class RecorderRestService {
     @Timed
     @Path("/{index}")
     @POST
-    @Produces(UTF8JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @Consumes(UTF8JSON)
     @ApiOperation(value = "Store a new record in elasticsearch", produces = UTF8JSON, consumes = UTF8JSON)
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Successful operation", response = String.class),

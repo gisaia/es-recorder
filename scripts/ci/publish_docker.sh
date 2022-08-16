@@ -7,7 +7,7 @@ RELEASE_VERSION=$1
 
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 PROJECT_ROOT_DIRECTORY="$SCRIPT_DIRECTORY"/../..
-echo "=> ARLAS_VERSION:${ARLAS_VERSION}"
+echo "=> RELEASE_VERSION:${RELEASE_VERSION}"
 # Update project version and build
 ${SCRIPT_DIRECTORY}/build_maven.sh ${RELEASE_VERSION}
 
