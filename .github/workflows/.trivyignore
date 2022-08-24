@@ -1,11 +1,2 @@
 # Waiting for Dropwizard to be upgraded to 3.0 or 4.0
 CVE-2022-2191
-
-# Waiting for Debian to be updated
-CVE-2022-27404
-CVE-2022-27405
-CVE-2022-27406
-CVE-2022-2097
-CVE-2022-34169
-CVE-2022-37434
-CVE-2022-2068
