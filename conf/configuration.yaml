@@ -54,7 +54,7 @@ arlas_cors:
 
 elastic:
   elastic-nodes: ${ES_RECORDER_ELASTIC_NODES:-localhost:9200}
-  elastic-sniffing: ${ARLAS_ELASTIC_SNIFFING:-false}
+  elastic-sniffing: ${ES_RECORDER_ELASTIC_SNIFFING:-false}
   elastic-enable-ssl: ${ES_RECORDER_ELASTIC_ENABLE_SSL:-false}
   elastic-credentials: ${ES_RECORDER_ELASTIC_CREDENTIALS}
   elastic-skip-master: ${ES_RECORDER_ELASTIC_SKIP_MASTER:-true}
