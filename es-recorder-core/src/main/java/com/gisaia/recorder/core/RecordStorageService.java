@@ -51,10 +51,10 @@ public class RecordStorageService {
         request.setConflicts("proceed");
         request.setQuery(new TermQueryBuilder(field, value));
         request.setRefresh(true);
-        esClient.getClient().deleteByQueryAsync(request, RequestOptions.DEFAULT, new ActionListener<BulkByScrollResponse>() {
+        esClient.getClient().deleteByQueryAsync(request, RequestOptions.DEFAULT, new ActionListener<>() {
             @Override
             public void onResponse(BulkByScrollResponse bulkResponse) {
-                LOGGER.info("Deleted docs with " + field + "=" + value + " (" + bulkResponse.getDeleted() + " docs deleted)");
+                LOGGER.info("Deleted docs with " + field + "=" + value + " (" + bulkResponse.getDeleted() + " doc(s) deleted)");
             }
 
             @Override

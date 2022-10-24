@@ -81,17 +81,17 @@ public class RecorderIT {
                 .body("download.email_user", equalTo("foo@bar.com"))
                 .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
         deleteRecord().then().statusCode(202);
-        TimeUnit.SECONDS.sleep(10);
+        TimeUnit.SECONDS.sleep(5);
         getRecord(id).then().statusCode(404);
     }
 
     @Test
-    @Ignore
     public void test03DeleteManyRecords() throws InterruptedException {
         String id = storeRecord().then().statusCode(201)
                 .extract().body().jsonPath().get("id");
         String id2 = storeRecord().then().statusCode(201)
                 .extract().body().jsonPath().get("id");
+        TimeUnit.SECONDS.sleep(5);
         getRecord(id).then().statusCode(200)
                 .body("download.email_user", equalTo("foo@bar.com"))
                 .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
@@ -99,9 +99,9 @@ public class RecorderIT {
                 .body("download.email_user", equalTo("foo@bar.com"))
                 .body("client.browser", startsWithIgnoringCase("Apache-HttpClient"));
         deleteRecord().then().statusCode(202);
-        TimeUnit.SECONDS.sleep(10);
-        getRecord(id2).then().statusCode(404);
+        TimeUnit.SECONDS.sleep(5);
         getRecord(id).then().statusCode(404);
+        getRecord(id2).then().statusCode(404);
     }
 
     protected Response storeRecord() {

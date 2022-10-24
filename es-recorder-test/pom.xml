@@ -50,7 +50,7 @@
         <dependency>
             <groupId>io.arlas</groupId>
             <artifactId>arlas-core</artifactId>
-            <version>22.0.0</version>
+            <version>${arlas.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
