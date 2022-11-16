@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.util.Optional;
+
+import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
 
 @Path("/records")
 @Api(value = "/records")
@@ -56,11 +59,14 @@ public class RecorderRestService {
             @ApiParam(name = "record")
             @Valid ObjectNode record
     ) throws ArlasException {
+        String ip = Optional.ofNullable(headers.getHeaderString(X_FORWARDED_FOR))
+                .orElseGet(() -> httpServletRequest.getRemoteAddr())
+                .split(",")[0].trim();
         return Response.created(uriInfo.getRequestUriBuilder().build())
                 .entity(service.store(record,
                         headers.getHeaderString(HttpHeaders.USER_AGENT),
                         headers.getHeaderString("Referer"),
-                        httpServletRequest.getRemoteAddr(), index))
+                        ip, index))
                 .type(UTF8JSON)
                 .build();
     }
