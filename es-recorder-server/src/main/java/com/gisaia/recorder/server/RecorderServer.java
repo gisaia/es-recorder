@@ -4,11 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.gisaia.recorder.core.RecordStorageService;
 import com.gisaia.recorder.rest.service.RecorderRestService;
 import com.gisaia.recorder.util.EsRecorderConfiguration;
-import com.smoketurner.dropwizard.zipkin.ZipkinBundle;
-import com.smoketurner.dropwizard.zipkin.ZipkinFactory;
 import io.arlas.commons.config.ArlasCorsConfiguration;
 import io.arlas.commons.exceptions.ArlasExceptionMapper;
 import io.arlas.commons.exceptions.ConstraintViolationExceptionMapper;
@@ -53,12 +50,6 @@ public class RecorderServer extends Application<EsRecorderConfiguration> {
             @Override
             protected SwaggerBundleConfiguration getSwaggerBundleConfiguration(EsRecorderConfiguration configuration) {
                 return configuration.swaggerBundleConfiguration;
-            }
-        });
-        bootstrap.addBundle(new ZipkinBundle<>(getName()) {
-            @Override
-            public ZipkinFactory getZipkinFactory(EsRecorderConfiguration configuration) {
-                return configuration.zipkinConfiguration;
             }
         });
         bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html"));
